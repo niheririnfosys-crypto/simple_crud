@@ -23,6 +23,8 @@ def get_all_students():
     # Pydantic objects can be returned directly, FastAPI handles the conversion!
     return list(students.values())
 #4. Get a student by ID
+
+
 @app.get("/students/{student_id}")
 def get_student(student_id: int):
     if student_id not in students:
