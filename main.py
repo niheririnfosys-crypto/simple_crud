@@ -7,14 +7,17 @@ class Student(BaseModel):
     name: str
     department: str
     contact_number: str
+    fathers_name:str
+    mothers_name:str
+    
 
 app = FastAPI()
 
 # 2. Mock Database 
 students = {
-    1: Student(id=1, name="Niher", department="Computer Science", contact_number="11111"),
-    2: Student(id=2, name="Alice", department="Data Science", contact_number="22222"),
-    3: Student(id=3, name="Bob", department="Electrical Engineering", contact_number="33333")
+    1: Student(id=1, name="Azad", department="Computer Science", contact_number="11111", fathers_name="Akram",mothers_name="Sabina" ),
+    2: Student(id=2, name="Alice", department="Data Science", contact_number="22222", fathers_name="Clinton", mothers_name="Winslet"),
+    3: Student(id=3, name="Bob", department="Electrical Engineering", contact_number="33333", fathers_name="Zim",mothers_name="Katti")
 }
 
 # 3. Get all students
