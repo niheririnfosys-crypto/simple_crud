@@ -29,12 +29,15 @@ class Student(BaseModel):
     fathers_name: str
     mothers_name: str
 
+    class Config:
+        from_attributes = True
+
 
 app = FastAPI()
 
 
 # 3. Get all students
-@app.get("/students")
+@app.get("/students", response_model=list[Student])
 def get_all_students(
     db: Session = Depends(get_db)
 ):
@@ -47,7 +50,7 @@ def get_all_students(
 
 # 4. Get a student by ID
 
-@app.get("/students/{student_id}")
+@app.get("/students/{student_id}", response_model=Student)
 def get_student(
     student_id: int,
     db: Session = Depends(get_db)
@@ -71,7 +74,7 @@ def get_student(
 
 # 5. Create a new student
 
-@app.post("/students")
+@app.post("/students", response_model=Student)
 def save_student(
     student: Student,
     db: Session = Depends(get_db)
