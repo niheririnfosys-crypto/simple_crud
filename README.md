@@ -1,91 +1,236 @@
 # Student Management CRUD API
 
-A lightweight, high-performance RESTful API built with **FastAPI** to manage student records. This project demonstrates full CRUD (Create, Read, Update, Delete) capabilities using an in-memory data store, specifically optimized for seamless execution and testing directly via **URL Path & Query Parameters** (without requiring complex request bodies).
+A lightweight, high-performance RESTful API built with **FastAPI** to manage student records. This project demonstrates complete CRUD (Create, Read, Update, Delete) operations using a real **SQLite database** with **SQLAlchemy ORM**.
+
+The API provides a clean database-driven backend architecture with automatic data validation, persistent storage, and easy testing through **Swagger UI, Bruno, curl, or API clients**.
+
+---
 
 ## 🚀 Features
 
-- **In-Memory Database**: Blazing fast state management using native Python dictionaries.
-- **Robust Data Validation**: Automatic type validation leveraging FastAPI's underlying parsing system.
-- **Strict Business Logic**: Preventative checks against duplicate data (e.g., matching IDs or clashing contact numbers).
-- **Pure URL Interaction**: No JSON payloads required—perfect for quick browser testing, curl commands, or lightweight API clients like Bruno.
+- **SQLite Database Integration**  
+  Persistent student data storage using SQLite database.
+
+- **SQLAlchemy ORM**
+  Database interaction through SQLAlchemy models instead of direct SQL queries.
+
+- **Complete CRUD Operations**
+  - Create new students
+  - Read all students
+  - Read a student by ID
+  - Update existing student information
+  - Delete student records
+
+- **Automatic Data Validation**
+  Request and response validation using Pydantic models.
+
+- **Business Logic Validation**
+  Prevents:
+  - Duplicate student IDs
+  - Duplicate contact numbers
+
+- **FastAPI Dependency Injection**
+  Database sessions are managed safely using FastAPI's dependency system.
+
+- **Interactive API Testing**
+  Supports testing using:
+  - Swagger UI
+  - Bruno
+  - Browser
+  - curl
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Framework**: FastAPI
-- **Server**: Uvicorn (ASGI server)
-- **Data Modeling**: Pydantic
-- **Testing Client**: Bruno / Web Browser
+- **Backend Framework**: FastAPI
+- **Server**: Uvicorn (ASGI Server)
+- **Database**: SQLite
+- **ORM**: SQLAlchemy
+- **Data Validation**: Pydantic
+- **Testing Client**: Bruno / Swagger UI
 
 ---
 
-## 📂 Code Overview (`main.py`)
+## 📂 Project Structure
+crud_api/
+│
+├── main.py # FastAPI routes and CRUD operations
+│
+├── database.py # SQLite database connection and session setup
+│
+├── models.py # SQLAlchemy database models
+│
+├── app.db # SQLite database file
+│
+├── requirements.txt
+│
+└── .gitignore
 
-Below is the complete implementation used in this project:
 
-```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+---
 
-# 1. The Data Blueprint
-class Student(BaseModel):
-    id: int
-    name: str
-    department: str
-    contact_number: str
+## 🗄️ Database Model
 
-app = FastAPI()
+Student table:
 
-# 2. In-Memory Mock Database
-students = {
-    1: Student(id=1, name="Niher", department="Computer Science", contact_number="11111"),
-    2: Student(id=2, name="Alice", department="Data Science", contact_number="22222")
+| Field | Type | Description |
+|---|---|---|
+| id | Integer | Primary key |
+| name | String | Student name |
+| department | String | Academic department |
+| contact_number | String | Unique contact number |
+| fathers_name | String | Father's name |
+| mothers_name | String | Mother's name |
+
+---
+
+## 🔌 API Endpoints
+
+### 1. Get All Students
+
+
+GET /students
+
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Azad",
+    "department": "Computer Science",
+    "contact_number": "11111",
+    "fathers_name": "Akram",
+    "mothers_name": "Sabina"
+  }
+]
+2. Get Student By ID
+GET /students/{student_id}
+
+Example:
+
+GET /students/1
+
+Response:
+
+{
+  "id":1,
+  "name":"Azad",
+  "department":"Computer Science",
+  "contact_number":"11111",
+  "fathers_name":"Akram",
+  "mothers_name":"Sabina"
+}
+3. Create Student
+POST /students
+
+Request body:
+
+{
+  "id":4,
+  "name":"John",
+  "department":"Software Engineering",
+  "contact_number":"44444",
+  "fathers_name":"David",
+  "mothers_name":"Maria"
 }
 
-# 3. READ: Get All Students
-@app.get("/students")
-def get_all_students():
-    return list(students.values())
+Response:
 
-# 4. READ: Get Single Student by ID
-@app.get("/students/{student_id}")
-def get_student(student_id: int):
-    if student_id not in students:
-        raise HTTPException(status_code=404, detail="Student not found")
-    return students[student_id]
+{
+  "id":4,
+  "name":"John",
+  "department":"Software Engineering",
+  "contact_number":"44444",
+  "fathers_name":"David",
+  "mothers_name":"Maria"
+}
+4. Update Student
+PUT /students/{student_id}
 
-# 5. CREATE: Add New Student entirely via URL Query Parameters
-@app.post("/students/create")
-def create_student_url(id: int, name: str, department: str, contact_number: str):
-    if id in students:
-        raise HTTPException(status_code=400, detail="Student with this ID already exists")
-    if contact_number in [s.contact_number for s in students.values()]:
-        raise HTTPException(status_code=400, detail="Contact number already exists")
-        
-    new_student = Student(id=id, name=name, department=department, contact_number=contact_number)
-    students[id] = new_student
-    return {"message": "Created successfully", "student": new_student}
+Example:
 
-# 6. UPDATE: Modify Student entirely via URL (Path + Query Parameters)
-@app.put("/students/update/{student_id}")
-def update_student_url(student_id: int, name: str, department: str, contact_number: str):
-    if student_id not in students:
-        raise HTTPException(status_code=404, detail="Student not found")
-    
-    for s in students.values():
-        if s.contact_number == contact_number and s.id != student_id:
-            raise HTTPException(status_code=400, detail="Contact number belongs to someone else")
-            
-    updated_student = Student(id=student_id, name=name, department=department, contact_number=contact_number)
-    students[student_id] = updated_student
-    return {"message": "Updated successfully", "student": updated_student}
+PUT /students/4
 
-# 7. DELETE: Remove Student entirely via URL Path Parameter
-@app.delete("/students/delete/{student_id}")
-def delete_student_url(student_id: int):
-    if student_id not in students:
-        raise HTTPException(status_code=404, detail="Student not found")
-        
-    deleted = students.pop(student_id)
-    return {"message": f"Student '{deleted.name}' deleted successfully"}
+Request:
+
+{
+  "id":4,
+  "name":"John Updated",
+  "department":"AI Engineering",
+  "contact_number":"44444",
+  "fathers_name":"David",
+  "mothers_name":"Maria"
+}
+5. Delete Student
+DELETE /students/{student_id}
+
+Example:
+
+DELETE /students/4
+
+Response:
+
+{
+  "message":"Student deleted successfully"
+}
+▶️ Running the Project
+
+Create virtual environment:
+
+python -m venv .venv
+
+Activate:
+
+Linux:
+
+source .venv/bin/activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+Run server:
+
+uvicorn main:app --reload
+
+Open:
+
+http://127.0.0.1:8000/docs
+🧪 Database Checking
+
+Open SQLite:
+
+sqlite3 app.db
+
+View tables:
+
+.tables
+
+Check students:
+
+SELECT * FROM students;
+
+Exit:
+
+.quit
+
+📌 Future Improvements
+
+Possible next improvements:
+
+Add authentication (JWT)
+Add user roles
+Add Alembic database migrations
+Separate routers and schemas
+PostgreSQL migration
+Docker deployment
+Cloud deployment
+
+👨‍💻 Author
+
+Built with FastAPI + SQLite + SQLAlchemy
+
+
