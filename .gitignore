@@ -97,3 +97,6 @@ dmypy.json
 *.swo
 *~
 .DS_Store
+
+# SQLite database
+app.db
