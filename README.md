@@ -8,11 +8,21 @@ The API provides a clean database-driven backend architecture with automatic dat
 
 ## 🚀 Features
 
-- **SQLite Database Integration**  
-  Persistent student data storage using SQLite database.
+- **SQLite Database Integration** Persistent student data storage using SQLite database.
 
-- **SQLAlchemy ORM**
-  Database interaction through SQLAlchemy models instead of direct SQL queries.
+### Main Dependencies
+
+- **FastAPI**: A modern Python framework used to build the REST API endpoints.
+- **Uvicorn**: An ASGI server used to run the FastAPI application.
+- **SQLAlchemy**: A database toolkit and ORM library used for database connection management, SQL operations, and mapping Python objects to database tables.
+- **Pydantic**: Used for data validation and defining request/response schemas.
+- **Starlette**: The underlying web framework component that provides core web functionality for FastAPI.
+
+### SQLAlchemy Database Engine and ORM
+
+SQLAlchemy Engine acts as a bridge between the application and the database. It manages database connections, handles SQL execution, and provides a connection pool for efficient request handling. For SQLite, `check_same_thread=False` allows database connections to work safely with FastAPI request handling. 
+
+SQLAlchemy ORM maps Python classes and objects to database tables and rows, allowing developers to interact with the database using Python code instead of writing raw SQL queries.
 
 - **Complete CRUD Operations**
   - Create new students
@@ -21,23 +31,15 @@ The API provides a clean database-driven backend architecture with automatic dat
   - Update existing student information
   - Delete student records
 
-- **Automatic Data Validation**
-  Request and response validation using Pydantic models.
+- **Automatic Data Validation** Request and response validation using Pydantic models.
 
-- **Business Logic Validation**
-  Prevents:
+- **Business Logic Validation** Prevents:
   - Duplicate student IDs
   - Duplicate contact numbers
 
-- **FastAPI Dependency Injection**
-  Database sessions are managed safely using FastAPI's dependency system.
+- **FastAPI Dependency Injection** Database sessions are managed safely using FastAPI's dependency system.
 
-- **Interactive API Testing**
-  Supports testing using:
-  - Swagger UI
-  - Bruno
-  - Browser
-  - curl
+- **Interactive API Testing** Supports testing using Swagger UI, Bruno, Browser, and curl.
 
 ---
 
@@ -53,50 +55,18 @@ The API provides a clean database-driven backend architecture with automatic dat
 ---
 
 ## 📂 Project Structure
+
+```text
 crud_api/
 │
-├── main.py # FastAPI routes and CRUD operations
-│
-├── database.py # SQLite database connection and session setup
-│
-├── models.py # SQLAlchemy database models
-│
-├── app.db # SQLite database file
-│
-├── requirements.txt
-│
-└── .gitignore
+├── main.py            # FastAPI routes and CRUD operations
+├── database.py        # SQLite database connection and session setup
+├── models.py          # SQLAlchemy database models
+├── app.db             # SQLite database file (generated automatically)
+├── requirements.txt   # Project dependencies
+└── .gitignore         # Untracked Git files
 
-
----
-
-## 🗄️ Database Model
-
-Student table:
-
-| Field | Type | Description |
-|---|---|---|
-| id | Integer | Primary key |
-| name | String | Student name |
-| department | String | Academic department |
-| contact_number | String | Unique contact number |
-| fathers_name | String | Father's name |
-| mothers_name | String | Mother's name |
-
----
-
-## 🔌 API Endpoints
-
-### 1. Get All Students
-
-
-GET /students
-
-
-Example response:
-
-```json
-[
+🗄️ Database ModelStudent Table Schema:FieldTypeDescriptionidIntegerPrimary keynameStringStudent namedepartmentStringAcademic departmentcontact_numberStringUnique contact numberfathers_nameStringFather's namemothers_nameStringMother's name🔌 API Endpoints1. Get All StudentsMethod: GETURL: /studentsExample Response:JSON[
   {
     "id": 1,
     "name": "Azad",
@@ -106,131 +76,48 @@ Example response:
     "mothers_name": "Sabina"
   }
 ]
-2. Get Student By ID
-GET /students/{student_id}
-
-Example:
-
-GET /students/1
-
-Response:
-
-{
-  "id":1,
-  "name":"Azad",
-  "department":"Computer Science",
-  "contact_number":"11111",
-  "fathers_name":"Akram",
-  "mothers_name":"Sabina"
+2. Get Student By IDMethod: GETURL: /students/{student_id}Example Request: GET /students/1Response:JSON{
+  "id": 1,
+  "name": "Azad",
+  "department": "Computer Science",
+  "contact_number": "11111",
+  "fathers_name": "Akram",
+  "mothers_name": "Sabina"
 }
-3. Create Student
-POST /students
-
-Request body:
-
-{
-  "id":4,
-  "name":"John",
-  "department":"Software Engineering",
-  "contact_number":"44444",
-  "fathers_name":"David",
-  "mothers_name":"Maria"
+3. Create StudentMethod: POSTURL: /studentsRequest Body:JSON{
+  "id": 4,
+  "name": "John",
+  "department": "Software Engineering",
+  "contact_number": "44444",
+  "fathers_name": "David",
+  "mothers_name": "Maria"
 }
-
-Response:
-
-{
-  "id":4,
-  "name":"John",
-  "department":"Software Engineering",
-  "contact_number":"44444",
-  "fathers_name":"David",
-  "mothers_name":"Maria"
+Response:JSON{
+  "id": 4,
+  "name": "John",
+  "department": "Software Engineering",
+  "contact_number": "44444",
+  "fathers_name": "David",
+  "mothers_name": "Maria"
 }
-4. Update Student
-PUT /students/{student_id}
-
-Example:
-
-PUT /students/4
-
-Request:
-
-{
-  "id":4,
-  "name":"John Updated",
-  "department":"AI Engineering",
-  "contact_number":"44444",
-  "fathers_name":"David",
-  "mothers_name":"Maria"
+4. Update StudentMethod: PUTURL: /students/{student_id}Example Request: PUT /students/4Request Body:JSON{
+  "name": "John Updated",
+  "department": "AI Engineering",
+  "contact_number": "44444",
+  "fathers_name": "David",
+  "mothers_name": "Maria"
 }
-5. Delete Student
-DELETE /students/{student_id}
-
-Example:
-
-DELETE /students/4
-
-Response:
-
-{
-  "message":"Student deleted successfully"
+5. Delete StudentMethod: DELETEURL: /students/{student_id}Example Request: DELETE /students/4Response:JSON{
+  "message": "Student deleted successfully"
 }
-▶️ Running the Project
+▶️ Running the ProjectCreate a virtual environment:Bashpython -m venv .venv
+Activate the environment:Linux/macOS: source .venv/bin/activateWindows: .venv\Scripts\activateInstall dependencies:Bashpip install -r requirements.txt
+Run the Uvicorn server:Bashuvicorn main:app --reload
+Open Interactive Docs: Navigate to http://127.0.0.1:8000/docs to test via Swagger UI.🧪 Database Checking (CLI)You can inspect the generated persistent records straight from your terminal terminal:Open SQLite CLI:Bashsqlite3 app.db
+View generated tables:SQL.tables
+Check contents inside the students table:SQLSELECT * FROM students;
+Exit SQLite CLI:SQL.quit
 
-Create virtual environment:
+📌 Future ImprovementsAdd authentication (JWT)Add user roles & access permissionsIntegrated database version control via Alembic migrationsBreak core components out into distinct routers and Pydantic schemasMigration from SQLite to PostgreSQLContainerization using Docker
 
-python -m venv .venv
-
-Activate:
-
-Linux:
-
-source .venv/bin/activate
-
-Install dependencies:
-
-pip install -r requirements.txt
-
-Run server:
-
-uvicorn main:app --reload
-
-Open:
-
-http://127.0.0.1:8000/docs
-🧪 Database Checking
-
-Open SQLite:
-
-sqlite3 app.db
-
-View tables:
-
-.tables
-
-Check students:
-
-SELECT * FROM students;
-
-Exit:
-
-.quit
-
-📌 Future Improvements
-
-Possible next improvements:
-
-Add authentication (JWT)
-Add user roles
-Add Alembic database migrations
-Separate routers and schemas
-PostgreSQL migration
-Docker deployment
-Cloud deployment
-
-👨‍💻 Author
-
-Built with FastAPI + SQLite + SQLAlchemy
-
-
+👨‍💻 AuthorBuilt with FastAPI + SQLite + SQLAlchemy.
